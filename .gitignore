@@ -1,3 +1,5 @@
 .env
 telegram-bot-examples/
 venv/
+*.pyc
+temp/
