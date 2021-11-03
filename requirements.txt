@@ -2,3 +2,4 @@ requests
 python-telegram-bot
 httplib2
 schedule
+pandas
