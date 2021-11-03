@@ -1,33 +1,35 @@
-import os
-import json
-import pandas as pd
-
-from backend.callpicker import CallPicker
+from backend.db import DataBase
+from backend.logger import logger
+from backend.utils import Transformer
 from backend.messenger import Messenger
-from static.message import notification
+from backend.callpicker import CallPicker
 
 
-import logging
-logging.basicConfig(
-    level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-
-
-TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
-CHANNEL_NAME = os.environ.get('CHANNEL_NAME')
+REGISTER_SIZE = 15
 
 if __name__ == '__main__':
     '''
     This is the main entry point for the application.
     '''
-    register = CallPicker()
-    notifier = Messenger(TELEGRAM_TOKEN, CHANNEL_NAME)
+    logger.info('Starting application')
+    callpicker = CallPicker()
+    database = DataBase()
+    transformer = Transformer()
+    notifier = Messenger()
 
-    calls_row = register.get_calls()
-    calls_df = pd.DataFrame(calls_row)
-    calls_df.to_csv('temp/calls.csv', index=False)
-
-    # notifier.send_message(notification.format(
-    #     prety_date='2021', date='2021',
-    #     who_answered='some people', customer='customer'
-    # ))
+    last_logs_df = transformer.get_last_logs(
+        callpicker.get_calls(), size=REGISTER_SIZE
+    )
+    stored_logs = database.get_stored_logs(size=REGISTER_SIZE)
+    new_calls_df = transformer.split_new_logs(
+        last_logs_df, stored_logs
+    )
+    if len(new_calls_df):
+        logger.info('New calls found! Sending messages')
+        messages = transformer.get_messages_dict(new_calls_df)
+        notifier.send_messages(messages)
+        logger.info('Updating database')
+        database.save_last_logs(new_calls_df)
+    else:
+        logger.info('No new calls found')
+    logger.info('Done!')

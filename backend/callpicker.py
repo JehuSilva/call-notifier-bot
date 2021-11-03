@@ -1,14 +1,14 @@
 
-
-from backend.utils import FileManager
 import requests
 import http.client as client
+from backend.logger import logger
+from json.decoder import JSONDecodeError
+
 client._MAXHEADERS = 1000
 
 
-class CallPicker(FileManager):
+class CallPicker():
     def __init__(self):
-        FileManager.__init__('temp')
         self.URL = 'https://admin.callpicker.com/call_details/get_call_details_page/'
         self.HEADERS = {
             'authority': 'admin.callpicker.com',
@@ -34,43 +34,9 @@ class CallPicker(FileManager):
 
     def get_calls(self):
         try:
-            return self.read_dataframe('callsdataset')
-        except Exception:
-            response = requests.get(
+            logger.info('Fetching last calls from CallPicker')
+            return requests.get(
                 self.URL, headers=self.HEADERS, cookies=self.COOKIES, params=self.PARAMS
             ).json()['payload']
-            return [Model(row).get_keys() for row in response]
-
-
-class Model():
-    def __init__(self, row):
-        self.status = row['status']  # 'available' or 'busy'
-        self.destination = row['destination']  # who answered
-        self.redirection_type = row['redirection_type']
-        self.player = row['player'],
-        self.duration = row['duration']  # duration
-        self.returned = row['returned']
-        self.person_name = row['person_name']
-        self.caller_id = row['caller_id']  # customer
-        self.tagged = row['tagged']
-        self.trunk = row['trunk']  # TELEPHONE NUMBER
-        self.rating = row['rating']
-        self.date = row['date']  # date
-        self.pretty_date = row['pretty_date']  # pretty_date
-        self.uniqueid = row['uniqueid']
-        self.id = row['id']
-        self.clean_caller_id = row['clean_caller_id']
-        self.has_notes = row['has_notes']
-        self.trunk_description = row['trunk_description']
-
-    def get_keys(self):
-        return {
-            'status': self.status,
-            'telephone_number': self.trunk,
-            'duration': self.duration,
-            'customer': self.caller_id,
-            'who_anwered': self.destination,
-            'date': self.date,
-            'pretty_date': self.pretty_date,
-            'destination_description': self.trunk_description,
-        }
+        except JSONDecodeError:
+            logger.error('JSONDecodeError')

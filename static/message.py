@@ -1,15 +1,8 @@
 notification = '''
-\U0001F55BHora de llamada: {prety_date} ({date})
-\U0001F481¿Quien contestó?: {who_answered}
-\U0001F464Telefono de cliente: {customer}
-\U0001F464Destinatario: {trunk_description}
+\U0001F4D6 <b>Nueva llamada:</b> <i>{status}</i>
+\U0001F4C5 <b>Fecha de llamada</b>: {date}
+\U0001F551 <b>Hora de llamada</b>: {time}
+\U0001F464 <b>Telefono de cliente</b>: {customer}
+\U0001F4DE <b>¿A Quien marcó?</b> {company_phone}
+\U0001F481<b>¿Quien contestó?</b>: <i>{who_answered}</i>
 '''
-
-#   'status': self.status,
-#   'telephone_number': self.trunk,
-#   'duration': self.duration,
-#   'customer': self.caller_id,
-#   'who_anwered': self.destination,
-#   'date': self.date,
-#   'pretty_date': self.pretty_date,
-#   'destination_description': self.trunk_description,
