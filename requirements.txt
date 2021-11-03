@@ -3,4 +3,5 @@ requests
 httplib2
 schedule
 psycopg2
+sqlalchemy
 python-telegram-bot
