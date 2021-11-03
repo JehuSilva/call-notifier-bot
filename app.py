@@ -4,7 +4,6 @@ from backend.utils import Transformer
 from backend.messenger import Messenger
 from backend.callpicker import CallPicker
 
-
 REGISTER_SIZE = 20
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
+pandas
 requests
-python-telegram-bot
 httplib2
 schedule
-pandas
+psycopg2
+python-telegram-bot

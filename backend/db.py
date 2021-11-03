@@ -1,13 +1,14 @@
-import sqlite3
+import os
 import pandas as pd
 from backend.logger import logger
-from pandas.io.sql import DatabaseError
+from sqlalchemy import create_engine
+from sqlalchemy.exc import ProgrammingError
 
 
 class DataBase():
     def __init__(self):
         self.connection = None
-        # self.create_table()
+        self.db_uri = os.environ.get('DB_URI')
 
     def get_connection(self):
         '''
@@ -15,7 +16,7 @@ class DataBase():
         '''
         self.connection = None
         try:
-            self.connection = sqlite3.connect('callpicker.db')
+            self.connection = create_engine(self.db_uri).connect()
         except Exception as e:
             print(e)
         return self.connection
@@ -34,6 +35,7 @@ class DataBase():
         with self.get_connection() as cnx:
             cursor = cnx.cursor()
             cursor.execute('DELETE FROM call_logs;')
+            cursor.close()
 
     def get_stored_logs(self, size=15):
         '''
@@ -51,7 +53,7 @@ class DataBase():
                     'customer', 'who_answered', 'date', 'pretty_date',
                     'destination_description'
                 ]]
-            except DatabaseError:
+            except ProgrammingError:
                 logger.error('Table not found, create table.')
                 df = None
         return df
