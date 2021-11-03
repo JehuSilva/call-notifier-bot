@@ -1,6 +1,4 @@
-import os
 import pandas as pd
-from datetime import datetime as dt
 
 
 class Transformer:
@@ -27,12 +25,6 @@ class Transformer:
         if df2 is not None:
             diff_df = df1.merge(df2, left_on='id', right_on='id', how='inner')
             return df1[~df1['id'].isin(diff_df['id'])].drop_duplicates()
-            # diff_df = pd.merge(
-            #     df1, df2, on='id', how='outer', indicator='Exist'
-            # )
-            # return diff_df.loc[diff_df['Exist'] == 'left_only'].loc[
-            #     :, diff_df.columns != 'Exist'
-            # ]
         else:
             return df1
 
