@@ -28,14 +28,16 @@ class Messenger():
                 'channel_name': os.environ.get('FISIODINAMIC_CHANNEL_NAME')
             },
 
-        }[destination]
+        }.get(destination, None)
 
     def send_messages(self, messages):
         try:
             for message in messages:
-                logger.info(f'Sending message to {message["destination"]}')
                 keys = self.get_bot_credentials(message['destination'])
+                if keys is None:
+                    continue
                 bot = telegram.Bot(token=keys['token'])
+                logger.info(f'Sending message to {message["destination"]}')
                 bot.send_message(
                     chat_id=f'@{keys["channel_name"]}',
                     text=notification.format(**message),
