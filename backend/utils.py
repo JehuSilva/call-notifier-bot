@@ -56,7 +56,8 @@ class Transformer:
             'Available': 'Pizzal Santa Rosa',
             'Mago Magum': 'Mago Magun',
             'Fisiodinamic': 'Fisiodinamic',
-        }[destination]
+            'Tacozole': 'Tacozole',
+        }.get(destination, None)
 
     def get_messages_dict(self, df):
         '''
