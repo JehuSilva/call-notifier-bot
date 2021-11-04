@@ -41,11 +41,22 @@ class Transformer:
         Translate the status to spanish
         '''
         return {
-            'Self_service': '	Autoservicio \U0001F535',
-            'Redirected': ' Redireccionada \U0001F7E2',
-            'Lost': '	Perdida \U0001F534',
-            'Voicemail': ' Mensaje de voz \U0001F7E0',
+            'Self_service': '\U0001F535 <b>Status</b>: <i>Autoservicio</i> ',
+            'Redirected': '\U0001F7E2 <b>Status</b>: <i>Redireccionada</i> ',
+            'Lost': '\U0001F534 <b>Status</b>: <i>Perdida</i>',
+            'Voicemail': '\U0001F7E0 <b>Status</b>: <i>Mensaje de voz</i>',
         }[status]
+
+    def get_destination(self, destination):
+        '''
+        Gets the destination leyend acording to the
+        new tag received
+        '''
+        return {
+            'Available': 'Pizzal Santa Rosa',
+            'Mago Magum': 'Mago Magun',
+            'Fisiodinamic': 'Fisiodinamic',
+        }[destination]
 
     def get_messages_dict(self, df):
         '''
@@ -57,13 +68,15 @@ class Transformer:
             return {
                 'status': self.translate_status(row['status']),
                 'company_phone': row['telephone_number'],
-                # 'duration': row['duration'],
                 'customer': row['customer'],
                 'who_answered': row['who_answered'],
                 'date': date,
                 'time': time,
                 'pretty_date': row['pretty_date'],
                 'destination': row['destination_description'],
+                'destination_details': self.get_destination(
+                    row['destination_description']
+                )
             }
         return df.apply(converter, axis=1).tolist()
 
