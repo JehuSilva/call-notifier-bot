@@ -41,10 +41,10 @@ class Transformer:
         Translate the status to spanish
         '''
         return {
-            'Self_service': '\U0001F535 <b>Status</b>: <i>Autoservicio</i> ',
-            'Redirected': '\U0001F7E2 <b>Status</b>: <i>Redireccionada</i> ',
-            'Lost': '\U0001F534 <b>Status</b>: <i>Perdida</i>',
-            'Voicemail': '\U0001F7E0 <b>Status</b>: <i>Mensaje de voz</i>',
+            'Self_service': '<b>Status</b>: <i>Autoservicio</i> \U0001F535 ',
+            'Redirected': '<b>Status</b>: <i>Redireccionada</i> \U0001F7E2 ',
+            'Lost': '<b>Status</b>: <i>Perdida</i> \U0001F534 ',
+            'Voicemail': '<b>Status</b>: <i>Mensaje de voz</i> \U0001F7E0 ',
         }[status]
 
     def get_destination(self, destination):
@@ -53,7 +53,7 @@ class Transformer:
         new tag received
         '''
         return {
-            'Available': 'Pizzal Santa Rosa',
+            'Available': 'Pizzall Santa Rosa',
             'Mago Magum': 'Mago Magun',
             'Fisiodinamic': 'Fisiodinamic',
             'Tacozole': 'Tacozole',

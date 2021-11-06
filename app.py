@@ -23,7 +23,7 @@ if __name__ == '__main__':
     new_calls_df = transformer.split_new_logs(
         last_logs_df, stored_logs
     )
-    if len(new_calls_df):
+    if len(new_calls_df) > 0:
         logger.info('New calls found! Sending messages')
         messages = transformer.get_messages_dict(new_calls_df)
         notifier.send_messages(messages)
