@@ -48,7 +48,6 @@ def main(event, context):
     logger.info(
         'Done! Execution time: %.3f seconds' % (time.time() - start_time)
     )
-    return 'Done!'
 
 
 if __name__ == '__main__':
