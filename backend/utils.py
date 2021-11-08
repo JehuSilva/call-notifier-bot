@@ -1,7 +1,8 @@
-import pandas as pd
+import pytz
+import datetime
 
 
-class Transformer:
+class Utils:
     '''
     This class helps to format the datasets
     in order to interact with the database
@@ -10,23 +11,39 @@ class Transformer:
     def __init__(self):
         pass
 
-    def get_last_logs(self, rows, size=15):
+    def split_new_calls(self, rows, stored_ids):
         '''
-        Returns a dataframe with the logs
+        Returns only the new calls not stored in bq
         '''
-        return pd.DataFrame(
-            [Model(row).get_keys() for row in rows]
-        ).sort_values(by='date', ascending=False)[0:size]
+        return [row for row in rows if row['id'] not in stored_ids]
 
-    def split_new_logs(self, df1, df2):
+    def format_to_bq(self, rows):
         '''
-        Returns the difference between both dataframes
+        Formats the rows according the pizzal.callpicks format.
         '''
-        if df2 is not None:
-            diff_df = df1.merge(df2, left_on='id', right_on='id', how='inner')
-            return df1[~df1['id'].isin(diff_df['id'])].drop_duplicates()
-        else:
-            return df1
+        return [
+            {
+                'status': row['status'],
+                'destination': row['destination'],
+                'redirection_type': row['redirection_type'],
+                'player': row['player'],
+                'duration': int(row['duration']) if row['duration'] != '-' else 0,
+                'returned': bool(row['returned']),
+                'person_name': row['person_name'],
+                'caller_id': row['caller_id'],
+                'tagged': bool(row['tagged']),
+                'trunk': row['trunk'],
+                'rating': row['rating'],
+                'date': row['date'],
+                'pretty_date': row['pretty_date'],
+                'uniqueid': row['uniqueid'],
+                'id': int(row['id']),
+                'clean_caller_id': row['clean_caller_id'],
+                'has_notes': bool(row['has_notes']),
+                'trunk_description': row['trunk_description'],
+                'update_time': datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            } for row in rows
+        ]
 
     def split_date_and_time(self, date_time):
         '''
@@ -59,59 +76,37 @@ class Transformer:
             'Tacozole': 'Tacozole',
         }.get(destination, None)
 
-    def get_messages_dict(self, df):
+    def format_to_telegram(self, rows):
         '''
         Returns a list of dicts with the information
         the telegram message needs
         '''
-        def converter(row):
-            date, time = self.split_date_and_time(row['date'])
-            return {
+        return [
+            {
                 'status': self.translate_status(row['status']),
-                'company_phone': row['telephone_number'],
-                'customer': row['customer'],
-                'who_answered': row['who_answered'],
-                'date': date,
-                'time': time,
+                'company_phone': row['trunk'],
+                'customer': row['caller_id'],
+                'who_answered': row['destination'],
+                'date': row['date'].split(' ')[0],
+                'time': row['date'].split(' ')[1],
                 'pretty_date': row['pretty_date'],
-                'destination': row['destination_description'],
+                'destination': row['trunk_description'],
                 'destination_details': self.get_destination(
-                    row['destination_description']
+                    row['trunk_description']
                 )
-            }
-        return df.apply(converter, axis=1).tolist()
+            } for row in rows
+        ]
 
-
-class Model():
-    def __init__(self, row):
-        self.status = row['status']  # 'available' or 'busy'
-        self.destination = row['destination']  # who answered
-        self.redirection_type = row['redirection_type']
-        self.player = row['player'],
-        self.duration = row['duration']  # duration
-        self.returned = row['returned']
-        self.person_name = row['person_name']
-        self.caller_id = row['caller_id']  # customer
-        self.tagged = row['tagged']
-        self.trunk = row['trunk']  # TELEPHONE NUMBER
-        self.rating = row['rating']
-        self.date = row['date']  # date
-        self.pretty_date = row['pretty_date']  # pretty_date
-        self.uniqueid = row['uniqueid']
-        self.id = row['id']
-        self.clean_caller_id = row['clean_caller_id']
-        self.has_notes = row['has_notes']
-        self.trunk_description = row['trunk_description']
-
-    def get_keys(self):
-        return {
-            'id': self.id,
-            'status': self.status,
-            'telephone_number': self.trunk,
-            'duration': self.duration,
-            'customer': self.caller_id,
-            'who_answered': self.destination,
-            'date': self.date,
-            'pretty_date': self.pretty_date,
-            'destination_description': self.trunk_description,
-        }
+    def is_time_in_range(self, when='morning'):
+        '''Returns whether current is in the range '''
+        tz = pytz.timezone('America/Mexico_City')
+        if when == 'morning':
+            start = datetime.time(20, 16, 0)
+            end = datetime.time(20, 16, 30)
+        if when == 'afternoon':
+            start = datetime.time(18, 15, 0)
+            end = datetime.time(18, 15, 30)
+        if when == 'night':
+            start = datetime.time(23, 58, 0)
+            end = datetime.time(23, 58, 30)
+        return start <= datetime.datetime.now(tz).time() <= end

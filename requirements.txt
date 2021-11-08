@@ -1,7 +1,6 @@
 pandas
 requests
 httplib2
-schedule
-psycopg2
-sqlalchemy
 python-telegram-bot
+google-cloud-bigquery
+google-cloud-bigquery-storage

@@ -1,34 +1,49 @@
+from google.cloud.bigquery import table
+import pytz
+import datetime
+import time
 from backend.db import DataBase
 from backend.logger import logger
-from backend.utils import Transformer
+from backend.utils import Utils
 from backend.messenger import Messenger
 from backend.callpicker import CallPicker
 
-REGISTER_SIZE = 20
 
 if __name__ == '__main__':
     '''
     This is the main entry point for the application.
     '''
+    SIZE = 10
+    # Initialize the database usefull objects
+    start_time = time.time()
     logger.info('Starting application')
     callpicker = CallPicker()
-    database = DataBase()
-    transformer = Transformer()
+    database = DataBase(schema='pizzall')
+    utils = Utils()
     notifier = Messenger()
 
-    last_logs_df = transformer.get_last_logs(
-        callpicker.get_calls(), size=REGISTER_SIZE
-    )
-    stored_logs = database.get_stored_logs(size=REGISTER_SIZE)
-    new_calls_df = transformer.split_new_logs(
-        last_logs_df, stored_logs
-    )
-    if len(new_calls_df) > 0:
-        logger.info('New calls found! Sending messages')
-        messages = transformer.get_messages_dict(new_calls_df)
-        notifier.send_messages(messages)
-        logger.info('Updating database')
-        database.save_last_logs(new_calls_df)
+    if utils.is_time_in_range(when='morning'):
+        logger.info('It is morning. Deleting old historical calls')
+        database.delete_old_rows(table='calls_history')
+        database.delete_2_days_rows(table='callpicks')
+    if utils.is_time_in_range(
+            when='afternoon') or utils.is_time_in_range(when='night'):
+        last_calls = utils.format_to_bq(callpicker.get_calls(size=50, page=1))
+        database.upload_rows('calls_history', last_calls)
+
+    # Fetching the last ten calls from callpicker and
+    # find the ones that are not registered in the database
+    last_calls = utils.format_to_bq(callpicker.get_calls(size=SIZE))
+    saved_calls = database.get_saved_calls(table='callpicks', size=SIZE)
+    new_calls = utils.split_new_calls(last_calls, saved_calls)
+
+    # Register the new calls in the database and
+    # send the notifications to the users
+    if len(new_calls) > 0:
+        logger.info('New calls found! Sending notifications')
+        notifier.send_messages(utils.format_to_telegram(new_calls))
+        database.upload_rows('callpicks', new_calls)
     else:
         logger.info('No new calls found')
     logger.info('Done!')
+    logger.info('--- %.3f seconds ---' % (time.time() - start_time))
