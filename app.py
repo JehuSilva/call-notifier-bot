@@ -1,6 +1,3 @@
-from google.cloud.bigquery import table
-import pytz
-import datetime
 import time
 from backend.db import DataBase
 from backend.logger import logger
@@ -22,12 +19,15 @@ if __name__ == '__main__':
     utils = Utils()
     notifier = Messenger()
 
+    # Updating tables in de database deppending on the time of the day
     if utils.is_time_in_range(when='morning'):
         logger.info('It is morning. Deleting old historical calls')
         database.delete_old_rows(table='calls_history')
         database.delete_2_days_rows(table='callpicks')
-    if utils.is_time_in_range(
-            when='afternoon') or utils.is_time_in_range(when='night'):
+    if utils.is_time_in_range(when='afternoon'):
+        last_calls = utils.format_to_bq(callpicker.get_calls(size=50, page=1))
+        database.upload_rows('calls_history', last_calls)
+    if utils.is_time_in_range(when='night'):
         last_calls = utils.format_to_bq(callpicker.get_calls(size=50, page=1))
         database.upload_rows('calls_history', last_calls)
 

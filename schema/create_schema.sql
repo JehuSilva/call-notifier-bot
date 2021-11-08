@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS pizzall;
-CREATE OR REPLACE TABLE pizzall.callpicks(
+CREATE OR REPLACE TABLE pizzall.calls_history(
     id  INTEGER,
     caller_id  STRING,
     clean_caller_id  STRING,
@@ -20,3 +20,7 @@ CREATE OR REPLACE TABLE pizzall.callpicks(
     uniqueid  STRING,
     update_time  DATETIME
 );
+CREATE OR REPLACE TABLE pizzall.callpicks AS
+SELECT * FROM pizzall.calls_history cp
+ORDER BY cp.date DESC;
+LIMIT 50;
