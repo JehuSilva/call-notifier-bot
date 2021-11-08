@@ -1,16 +1,6 @@
 from backend.logger import logger
-
-import json
 from google.cloud import bigquery as bq
-from google.oauth2 import service_account
-from google.api_core.exceptions import BadRequest, NotFound
-
-with open('/home/jehu/jehu/pizzal/bq_credentials.json') as f:
-    json_credentials = json.load(f)
-
-credentials = service_account.Credentials.from_service_account_info(
-    json_credentials
-)
+from google.api_core.exceptions import NotFound
 
 
 class DataBase():
@@ -20,7 +10,7 @@ class DataBase():
 
     def __init__(self, project='promobot-mcbftp', schema='pizzall'):
         self.schema = schema
-        self.client = bq.Client(project=project, credentials=credentials)
+        self.client = bq.Client(project=project)
 
     def delete_old_rows(self, table='calls_history'):
         '''
