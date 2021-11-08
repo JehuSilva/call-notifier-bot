@@ -6,7 +6,7 @@ from backend.messenger import Messenger
 from backend.callpicker import CallPicker
 
 
-def main(request):
+def main(event, context):
     '''
     This is the main entry point for the application.
     '''
