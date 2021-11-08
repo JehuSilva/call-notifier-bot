@@ -4,3 +4,4 @@ venv/
 *.pyc
 temp/
 callpicker.db
+__pycache__/
