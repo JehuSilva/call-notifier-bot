@@ -6,11 +6,11 @@ from backend.messenger import Messenger
 from backend.callpicker import CallPicker
 
 
-if __name__ == '__main__':
+def main():
     '''
     This is the main entry point for the application.
     '''
-    SIZE = 10
+    SIZE = 10  # Number of calls to be picked
     # Initialize the database usefull objects
     start_time = time.time()
     logger.info('Starting application')
@@ -46,4 +46,8 @@ if __name__ == '__main__':
     else:
         logger.info('No new calls found')
     logger.info('Done!')
-    logger.info('--- %.3f seconds ---' % (time.time() - start_time))
+    logger.info('Execution time: %.3f seconds' % (time.time() - start_time))
+
+
+if __name__ == '__main__':
+    main()
