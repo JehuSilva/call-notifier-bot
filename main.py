@@ -45,8 +45,10 @@ def main(request):
         database.upload_rows('callpicks', new_calls)
     else:
         logger.info('No new calls found')
-    logger.info('Done!')
-    logger.info('Execution time: %.3f seconds' % (time.time() - start_time))
+    logger.info(
+        'Done! Execution time: %.3f seconds' % (time.time() - start_time)
+    )
+    return 'Done!'
 
 
 if __name__ == '__main__':
