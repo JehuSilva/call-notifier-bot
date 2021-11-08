@@ -101,12 +101,12 @@ class Utils:
         '''Returns whether current is in the range '''
         tz = pytz.timezone('America/Mexico_City')
         if when == 'morning':
-            start = datetime.time(9, 0, 0)
-            end = datetime.time(9, 0, 30)
+            start = datetime.time(9, 10, 0)
+            end = datetime.time(9, 10, 30)
         if when == 'afternoon':
-            start = datetime.time(15, 15, 0)
-            end = datetime.time(15, 15, 30)
+            start = datetime.time(15, 10, 0)
+            end = datetime.time(15, 10, 30)
         if when == 'night':
-            start = datetime.time(23, 58, 0)
-            end = datetime.time(23, 58, 30)
+            start = datetime.time(23, 50, 0)
+            end = datetime.time(23, 50, 30)
         return start <= datetime.datetime.now(tz).time() <= end
