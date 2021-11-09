@@ -1,4 +1,4 @@
-# Pizzal Call Notifier Bot
+CallPicker Notifier Bot
 
 ## Quickstart
 
