@@ -17,15 +17,15 @@ class Messenger():
         return {
             'Available': {
                 'token': os.environ.get('PIZZAL_TOKEN'),
-                'channel_name': os.environ.get('PIZZAL_CHANNEL_NAME')
+                'channel_id': os.environ.get('PIZZAL_CHANNEL_ID')
             },
             'Mago Magum': {
                 'token': os.environ.get('MAGO_MAGUM_TOKEN'),
-                'channel_name': os.environ.get('MAGO_MAGUM_CHANNEL_NAME')
+                'channel_id': os.environ.get('MAGO_MAGUM_CHANNEL_ID')
             },
             'Fisiodinamic': {
                 'token': os.environ.get('FISIODINAMIC_TOKEN'),
-                'channel_name': os.environ.get('FISIODINAMIC_CHANNEL_NAME')
+                'channel_id': os.environ.get('FISIODINAMIC_CHANNEL_ID')
             },
 
         }.get(destination, None)
@@ -39,7 +39,7 @@ class Messenger():
                 bot = telegram.Bot(token=keys['token'])
                 logger.info(f'Sending message to {message["destination"]}')
                 bot.send_message(
-                    chat_id=f'@{keys["channel_name"]}',
+                    chat_id=keys['channel_id'],
                     text=notification.format(**message),
                     parse_mode=telegram.ParseMode.HTML
                 )
