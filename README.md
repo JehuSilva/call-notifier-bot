@@ -1,4 +1,4 @@
-CallPicker Notifier Bot
+# CallPicker Notifier Bot
 
 ## Quickstart
 
