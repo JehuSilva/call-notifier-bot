@@ -54,7 +54,7 @@ class Messenger():
                     'The missing messages will be sent in the next execution'
                 )
             except BadRequest as e:
-                print(e)
                 logger.error(
                     f'The bot is not authorized to send messages to the channel: {message["destination"]}'
                 )
+                logger.error(e)

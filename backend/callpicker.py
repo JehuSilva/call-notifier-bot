@@ -46,4 +46,4 @@ class CallPicker():
                 self.URL, headers=self.HEADERS, cookies=self.COOKIES, params=self.PARAMS
             ).json()['payload'][:size]
         except JSONDecodeError:
-            logger.error('JSONDecodeError')
+            raise Exception('The callpicker format is changed')
