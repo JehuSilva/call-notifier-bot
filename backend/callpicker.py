@@ -8,6 +8,10 @@ client._MAXHEADERS = 1000
 
 
 class CallPicker():
+    '''
+    This class is used to get the calls from the CallPicker API.
+    '''
+
     def __init__(self):
         self.URL = 'https://admin.callpicker.com/call_details/get_call_details_page/'
         self.HEADERS = {
@@ -29,6 +33,9 @@ class CallPicker():
         }
 
     def get_calls(self, size=50, page=1):
+        '''
+        This function returns a list of calls from the CallPicker API.
+        '''
         self.PARAMS = {
             'referrerPolicy': 'strict-origin-when-cross-origin',
             'page': page,
