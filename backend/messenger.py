@@ -3,7 +3,7 @@ import telegram
 
 from backend.logger import logger
 from static.message import notification
-from telegram.error import RetryAfter
+from telegram.error import RetryAfter, BadRequest
 
 
 class Messenger():
@@ -31,8 +31,13 @@ class Messenger():
         }.get(destination, None)
 
     def send_messages(self, messages):
-        try:
-            for message in messages:
+        ''' This functions will send the messages by every bot'''
+        # Reverse in order to send the last message first
+        messages.reverse()
+
+        # Send the messages one by one
+        for message in messages:
+            try:
                 keys = self.get_bot_credentials(message['destination'])
                 if keys is None:
                     continue
@@ -43,8 +48,13 @@ class Messenger():
                     text=notification.format(**message),
                     parse_mode=telegram.ParseMode.HTML
                 )
-        except RetryAfter:
-            logger.error(
-                'To many messages sent. '
-                'The missing messages will be sent in the next execution'
-            )
+            except RetryAfter:
+                logger.error(
+                    'To many messages sent. '
+                    'The missing messages will be sent in the next execution'
+                )
+            except BadRequest as e:
+                logger.error(
+                    f'The bot is not authorized to send messages to the channel: {message["destination"]}'
+                )
+                logger.error(e)
